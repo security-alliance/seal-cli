@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -108,4 +109,45 @@ func DownloadRaw(url string, outPath string) error {
 	}
 	_ = os.MkdirAll(filepath.Dir(outPath), 0755)
 	return os.WriteFile(outPath, data, 0644)
+}
+
+func FindLatestReleaseTag(repo string, branch string) (string, error) {
+	url := fmt.Sprintf("https://api.github.com/repos/%s/releases", repo)
+	client := &http.Client{Timeout: 30 * time.Second}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Accept", "application/vnd.github+json")
+	req.Header.Set("User-Agent", "seal-cli")
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("HTTP %d listing releases: %s", resp.StatusCode, url)
+	}
+
+	var releases []struct {
+		TagName      string `json:"tag_name"`
+		Prerelease   bool   `json:"prerelease"`
+		CreatedAt    string `json:"created_at"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&releases); err != nil {
+		return "", fmt.Errorf("decode releases: %w", err)
+	}
+
+	prefix := fmt.Sprintf("index-%s-", branch)
+	for _, r := range releases {
+		if strings.HasPrefix(r.TagName, prefix) {
+			return r.TagName, nil
+		}
+	}
+	return "", fmt.Errorf("no release found with prefix %s", prefix)
+}
+
+func DownloadRelease(repo string, tag string, assetName string, outPath string) error {
+	url := fmt.Sprintf("https://github.com/%s/releases/download/%s/%s", repo, tag, assetName)
+	return DownloadRaw(url, outPath)
 }

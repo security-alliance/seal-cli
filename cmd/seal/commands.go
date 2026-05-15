@@ -24,7 +24,7 @@ func loadIndexForBranch(branch string) (*index.Index, error) {
 func runUpdate(args []string) error {
 	source := getFlag(args, "--source")
 	if source == "" {
-		source = "raw"
+		source = "release"
 	}
 	ref := getFlag(args, "--ref")
 	if ref == "" {
@@ -40,7 +40,32 @@ func runUpdate(args []string) error {
 	}
 
 	if source == "release" {
-		return fmt.Errorf("release source not yet implemented. Use --source raw --ref <commit|branch>")
+		repo := "security-alliance/frameworks-mcp"
+		for _, b := range branches {
+			tag, err := cache.FindLatestReleaseTag(repo, b)
+			if err != nil {
+				return fmt.Errorf("finding latest %s release: %w", b, err)
+			}
+			asset := fmt.Sprintf("%s-index.json", b)
+			out := cache.IndexPath(b)
+			fmt.Printf("Downloading %s from release %s ...\n", b, tag)
+			if err := cache.DownloadRelease(repo, tag, asset, out); err != nil {
+				return fmt.Errorf("error downloading %s: %w", b, err)
+			}
+			fmt.Printf("Saved to %s\n", out)
+		}
+		// Try manifest
+		// Use the tag from the first branch to download manifest
+		firstTag, err := cache.FindLatestReleaseTag(repo, branches[0])
+		if err == nil {
+			manifestOut := cache.ManifestPath()
+			if err := cache.DownloadRelease(repo, firstTag, "manifest.json", manifestOut); err != nil {
+				fmt.Fprintf(os.Stderr, "Warning: manifest not available: %v\n", err)
+			} else {
+				fmt.Printf("Saved manifest to %s\n", manifestOut)
+			}
+		}
+		return nil
 	}
 
 	baseURL := fmt.Sprintf("https://raw.githubusercontent.com/security-alliance/frameworks-mcp/%s/indexes/", ref)
