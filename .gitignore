@@ -1,6 +1,6 @@
 # Go build artifacts
-seal
-seal-test
+/seal
+/seal-test
 *.exe
 
 # Test binary
