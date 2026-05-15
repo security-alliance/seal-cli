@@ -1,0 +1,18 @@
+- [x] Create IMPLEMENTATION.md and track files
+- [x] Fix MCP index schema (stable IDs, URLs, metadata)
+- [x] Fix MCP branch handling (build main/develop from respective checkouts)
+- [x] Fix MCP search caching
+- [x] Add MCP manifest/checksum generation
+- [x] Harden MCP pnpm setup (pin version, npmrc)
+- [x] Initialize Go module in /seal-cli
+- [x] Implement seal update command
+- [x] Implement seal list command
+- [x] Implement seal search command
+- [x] Implement seal fetch command
+- [x] Implement seal compare command
+- [x] Implement seal emergency command
+- [x] Implement seal tips command
+- [x] Add AGENTS.md retrieval policy
+- [x] Add tests
+- [x] Add query-quality acceptance checks
+- [x] Add release workflow scaffolding

@@ -1,0 +1,28 @@
+# Go build artifacts
+seal
+seal-test
+*.exe
+
+# Test binary
+*.test
+
+# Output of go coverage
+*.out
+
+# Dependency directories
+vendor/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Local cache (for testing)
+.cache/
