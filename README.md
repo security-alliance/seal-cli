@@ -6,6 +6,8 @@ SEAL Frameworks CLI — read-only retrieval for humans and agents.
 
 Download the binary from [GitHub Releases](https://github.com/security-alliance/seal-cli/releases) and verify the checksum.
 
+> **Note:** `seal update --source release` requires index releases to exist in `frameworks-mcp`.
+
 ```bash
 # Example (Linux amd64)
 gh release download -R security-alliance/seal-cli --pattern 'seal_*_linux_amd64.tar.gz'
